@@ -1,6 +1,3 @@
-
-
-
 function Get-Profit{
 <#
 .SYNOPSIS

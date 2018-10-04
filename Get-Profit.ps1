@@ -70,7 +70,7 @@ function Get-Profit{
     - Add Silver/Copper conversion at final output
 #>
     param(
-        [int]$days,
+        [int]$days = 1,
         [int]$Businesses = 1,
         [switch]$full
     )

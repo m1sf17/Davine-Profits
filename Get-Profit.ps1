@@ -172,5 +172,9 @@ function Get-Profit{
         $daysRemaining -= 1
     }
 
-    Write-Host "Profit for $days days for $Businesses business(es) is: $total gold `n " -ForegroundColor Yellow
+    if($total -ge 0) {
+        Write-Host -ForegroundColor Yellow "Profit for $days days for $Businesses business(es) is: $total gold `n "
+    } else {
+        Write-Host -ForegroundColor Red "Loss for $days days for $Businesses business(es) is: $total gold `n "
+    }
 }

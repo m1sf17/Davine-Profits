@@ -64,6 +64,7 @@ function Get-Profit{
     ---------
     1Oct18 -- Script completed and uploaded to Github
     2Oct18 -- Help comment added
+    3Oct18 -- Add businesses parameter
     
     TODO
     ----

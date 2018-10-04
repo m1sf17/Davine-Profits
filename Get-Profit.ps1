@@ -1,9 +1,9 @@
 function Get-Profit{
 <#
 .SYNOPSIS
-    Calculates total profit for a set number of days
+    Calculates total profit for a set number of days and businesses
 .DESCRIPTION
-    Rolls 1d100 per day as specified. The result determines an amount to either subtract from or add to the total. The total is then output to the screen
+    Rolls 1d100 per day per business as specified. The result determines an amount to either subtract from or add to the total. The total is then output to the screen
 
     Roll Table Rules
     ----------------
@@ -23,20 +23,31 @@ function Get-Profit{
     Determines the number of days to calculate into the total
 .PARAMETER Full
     Switch that shows roll output and subsequent currency calculation
+.PARAMETER Businesses
+    Determines the number of businesses to roll for (because one isn't enough)
 .EXAMPLE
     PS C:\WINDOWS\system32> Get-Profit -days 2
     
     ---------------------------------------------------------------------
-    Calculating Profits for 1 Business for 2 days:
+    Calculating Profits for 1 Business(es) for 2 days:
     ---------------------------------------------------------------------
 
-    Profit for 2 days is: 5 gold
+    Profit for 2 days for 1 business(es) is: 5 gold
+    
+.EXAMPLE
+    PS C:\WINDOWS\system32> Get-Profit -days 2 -Businesses 2
+    
+    ---------------------------------------------------------------------
+    Calculating Profits for 2 Business(es) for 2 days:
+    ---------------------------------------------------------------------
+
+    Profit for 2 days for 2 business(es) is: 5 gold
     
 .EXAMPLE
     PS C:\WINDOWS\system32> Get-Profit -days 2 -full
     
     ---------------------------------------------------------------------
-    Calculating Profits for 1 Business for 2 days:
+    Calculating Profits for 1 Business(es) for 2 days:
     ---------------------------------------------------------------------
 
     rolling 1d100 : 82
@@ -45,7 +56,7 @@ function Get-Profit{
     rolling 1d100 : 83
     Business earns a profit of 18 gold
 
-    Profit for 2 days is: 50 gold
+    Profit for 2 days for 1 business(es) is: 50 gold
 
 .NOTES
     Author: Wabbadabba
@@ -53,13 +64,15 @@ function Get-Profit{
     ---------
     1Oct18 -- Script completed and uploaded to Github
     2Oct18 -- Help comment added
+    3Oct18 -- Add businesses parameter
     
     TODO
     ----
     - Add Silver/Copper conversion at final output
 #>
     param(
-        [int]$days,
+        [int]$days = 1,
+        [int]$Businesses = 1,
         [switch]$full
     )
     
@@ -70,9 +83,9 @@ function Get-Profit{
 | $$  | $$| $$__| $$| $$   | $$  | $$  | $$$\| $$| $$__             
 | $$  | $$| $$    $$ \$$\ /  $$  | $$  | $$$$\ $$| $$  \            
 | $$  | $$| $$$$$$$$  \$$\  $$   | $$  | $$\$$ $$| $$$$$            
-| $$__/ $$| $$  | $$   \$$ $$   _| $$_ | $$ \$$$$| $$_____          
-| $$    $$| $$  | $$    \$$$   |   $$ \| $$  \$$$| $$     \         
- \$$$$$$$  \$$   \$$     \$     \$$$$$$ \$$   \$$ \$$$$$$$$                                                                                                                                         
+| $$__/ $$| $$  | $$   \$$ $$   _| $$_ | $$ \$$$$| $$_____
+| $$    $$| $$  | $$    \$$$   |   $$ \| $$  \$$$| $$     \
+ \$$$$$$$  \$$   \$$     \$     \$$$$$$ \$$   \$$ \$$$$$$$$
  _______   _______    ______   ________  ______  ________   ______  
 |       \ |       \  /      \ |        \|      \|        \ /      \ 
 | $$$$$$$\| $$$$$$$\|  $$$$$$\| $$$$$$$$ \$$$$$$ \$$$$$$$$|  $$$$$$\
@@ -86,8 +99,9 @@ function Get-Profit{
 ---------------------------------------------------------------------
 
 '@
-
-    $totalDays = $days
+    
+    $totalDays = $days * $Businesses
+    $daysRemaining = $totalDays
     $total = 0 
     
     # Change this to change maintanence cost
@@ -95,15 +109,14 @@ function Get-Profit{
     
     Clear-Host
     Write-Host $banner
-    Write-Host "Calculating Profits for 1 Business for $totalDays days: `n
+    Write-Host "Calculating Profits for $Businesses Business(es) for $totalDays days: `n
 --------------------------------------------------------------------- `n"
-    While($days -gt 0){
+    While($daysRemaining -gt 0){
         $roll = get-random -min 1 -max 101
         
         if ($roll -lt 21){
             $cost = $maint * 1.5
             $total -= $maint
-            $days = $days - 1
             if ($full){
                 Write-Host "rolling 1d100 : $roll"
                 Write-Host "Pay $cost gold as maintanence cost `n"
@@ -112,7 +125,6 @@ function Get-Profit{
         }elseif($roll -gt 20 -and $roll -lt 31){
             $cost = $maint
             $total -= $maint
-            $days = $days - 1
             if ($full){
                 Write-Host "rolling 1d100 : $roll"
                 Write-Host "Pay $cost gold as Maintanence Cost `n"
@@ -121,14 +133,12 @@ function Get-Profit{
         }elseif($roll -gt 30 -and $roll -lt 41){
             $cost = $maint * 0.5
             $total -= $maint
-            $days = $days - 1
             if ($full){
                 Write-Host "rolling 1d100 : $roll"
                 Write-Host "Pay $cost gold as Maintanence Cost `n"
             }
 
         }elseif($roll -gt 40 -and $roll -lt 61){
-            $days = $days - 1
             if ($full){
                 Write-Host "rolling 1d100 : $roll"
                 Write-Host "Business covers it's own maintanence cost `n"
@@ -136,7 +146,6 @@ function Get-Profit{
 
         }elseif($roll -gt 60 -and $roll -lt 81){
             $gold = (get-random -min 1 -max 7) * 5
-            $days = $days - 1
             if ($full){
                 Write-Host "rolling 1d100 : $roll"
                 Write-Host "Business earns a profit of $gold gold `n"
@@ -146,7 +155,6 @@ function Get-Profit{
             $gold = (get-random -min 1 -max 9) + 
                     (get-random -min 1 -max 9) * 5
             $total += $gold
-            $days = $days - 1
             if ($full){
                 Write-Host "rolling 1d100 : $roll"
                 Write-Host "Business earns a profit of $gold gold `n"
@@ -157,13 +165,17 @@ function Get-Profit{
                     (get-random -min 1 -max 11) +
                     (get-random -min 1 -max 11) * 5
             $total += $gold
-            $days = $days - 1
             if ($full){
                 Write-Host "rolling 1d100 : $roll"
                 Write-Host "Business earns a profit of $gold gold `n"
             }
         }
+        $daysRemaining -= 1
     }
 
-    Write-Host "Profit for $totalDays days is: $total gold `n " -ForegroundColor Yellow
+    if($total -ge 0) {
+        Write-Host -ForegroundColor Yellow "Profit for $days days for $Businesses business(es) is: $total gold `n "
+    } else {
+        Write-Host -ForegroundColor Red "Loss for $days days for $Businesses business(es) is: $total gold `n "
+    }
 }

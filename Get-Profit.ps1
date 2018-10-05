@@ -11,10 +11,10 @@ function Roll-Dice{
         [string]$die = '1d20'
     )
 
-    $multiplier = [int]$die.Split("d")[0]
+    [int]$multiplier, [int]$sides = $die.Split("d")
     $output = 0
     while($multiplier -gt 0){
-        $result = (Get-Random -min 1 -max ([int]$die.Split("d")[1] + 1))
+        $result = (Get-Random -min 1 -max ($sides + 1))
         $output += $result
         $multiplier -= 1
     }
